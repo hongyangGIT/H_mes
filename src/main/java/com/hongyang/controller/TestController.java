@@ -19,10 +19,18 @@ public class TestController {
 	@RequestMapping("/test.page")
 	public String testPage() {
 		return "test";
-	}
+	} 
 	@RequestMapping("/test.json")
 	public void testJson(User user) {
 		System.out.println(user.getName());
 		userService.addUser(user);
+	}
+	@RequestMapping("/admin.page")
+	public String adminPage() {
+		return "admin";
+	}
+	@RequestMapping("dept.page")
+	public String deptPage() {
+		return "dept";
 	}
 }

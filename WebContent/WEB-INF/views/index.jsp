@@ -7,6 +7,7 @@
 <title>Insert title here</title>
 </head>
 <body>
-	成功了
+	<jsp:forward page="/sys/admin.page"></jsp:forward>
+	
 </body>
 </html>

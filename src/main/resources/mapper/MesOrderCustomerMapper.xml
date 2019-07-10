@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hongyang.dao.MesOrderCustomerMapper" >
+  <resultMap id="BaseResultMap" type="com.hongyang.model.MesOrder" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="order_id" property="orderId" jdbcType="VARCHAR" />
+    <result column="order_clientname" property="orderClientname" jdbcType="VARCHAR" />
+    <result column="order_productname" property="orderProductname" jdbcType="VARCHAR" />
+    <result column="order_contractid" property="orderContractid" jdbcType="VARCHAR" />
+    <result column="order_imgid" property="orderImgid" jdbcType="VARCHAR" />
+    <result column="order_materialname" property="orderMaterialname" jdbcType="VARCHAR" />
+    <result column="order_cometime" property="orderCometime" jdbcType="TIMESTAMP" />
+    <result column="order_committime" property="orderCommittime" jdbcType="TIMESTAMP" />
+    <result column="order_inventorystatus" property="orderInventorystatus" jdbcType="INTEGER" />
+    <result column="order_salestatus" property="orderSalestatus" jdbcType="CHAR" />
+    <result column="order_materialsource" property="orderMaterialsource" jdbcType="CHAR" />
+    <result column="order_hurrystatus" property="orderHurrystatus" jdbcType="INTEGER" />
+    <result column="order_status" property="orderStatus" jdbcType="INTEGER" />
+    <result column="order_remark" property="orderRemark" jdbcType="VARCHAR" />
+    <result column="order_operator" property="orderOperator" jdbcType="VARCHAR" />
+    <result column="order_operate_time" property="orderOperateTime" jdbcType="TIMESTAMP" />
+    <result column="order_operate_ip" property="orderOperateIp" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, order_id, order_clientname, order_productname, order_contractid, order_imgid, 
+    order_materialname, order_cometime, order_committime, order_inventorystatus, order_salestatus, 
+    order_materialsource, order_hurrystatus, order_status, order_remark, order_operator, 
+    order_operate_time, order_operate_ip
+  </sql>
+  <select id="getOrderCount" resultType="Long">
+  	SELECT
+  	COUNT(1)
+  	FROM mes_order
+  </select>
+</mapper>

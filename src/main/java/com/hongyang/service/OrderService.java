@@ -7,13 +7,19 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
+import com.hongyang.beans.PageQuery;
+import com.hongyang.beans.PageResult;
 import com.hongyang.dao.MesOrderCustomerMapper;
 import com.hongyang.dao.MesOrderMapper;
+import com.hongyang.dto.SearchOrderDto;
+import com.hongyang.exception.ParamException;
 import com.hongyang.exception.SysMineException;
 import com.hongyang.model.MesOrder;
 import com.hongyang.param.MesOrderVo;
+import com.hongyang.param.SearchOrderParam;
 import com.hongyang.util.BeanValidator;
 import com.hongyang.util.MyStringUtils;
 
@@ -23,22 +29,21 @@ public class OrderService {
 	private MesOrderMapper merOrderMapper;
 	@Resource
 	private MesOrderCustomerMapper mesOrderCustomerMapper;
-	//×Ô¶¨ÒåÒ»¸öidÉú³ÉÆ÷
+	//è‡ªå®šä¹‰ä¸€ä¸ªIDç”Ÿæˆå™¨
 	private IdGenerator ig=new IdGenerator();
 
 	public void insertOrderBatch(MesOrderVo orderVo) {
-		System.out.println(orderVo);
-		//Êı¾İĞ£Ñé
+		//æ ¡éªŒ
 		BeanValidator.check(orderVo);
-		//ÅĞ¶ÏÊÇ·ñÅúÁ¿Ìí¼Ó
+		//åˆ¤æ–­æ˜¯å¦æ‰¹é‡æ·»åŠ 
 		Integer counts=orderVo.getCount();
 		System.out.println("COUNT:"+counts);
-		//¸ù¾İÉú³ÉµÄ¸öÊı£¬Éú³Éidsµ½¼¯ºÏ
+		//idé›†åˆ
 		List<String > ids=createOrderIdsDefault(Long.valueOf(counts));
 		
 		for(String orderid:ids) {
 			try {
-				//½«VO×ª»»³ÉPO
+				//å°†VOè½¬æ¢æˆPO
 				MesOrder mesOrder = MesOrder.builder()
 						.orderId(orderid)
 						.orderClientname(orderVo.getOrderClientname())//
@@ -57,9 +62,40 @@ public class OrderService {
 				
 				merOrderMapper.insertSelective(mesOrder);
 			} catch (Exception e) {
-				throw new SysMineException("´´½¨¹ı³Ì·¢ÉúÎÊÌâ");
+				throw new SysMineException("åˆ›å»ºè¿‡ç¨‹å‡ºç°é—®é¢˜");
 			}
 		}
+	}
+	
+	public PageResult<MesOrder> searchPageList(SearchOrderParam param, PageQuery page) {
+		///æ ¡éªŒ
+		BeanValidator.check(page);
+//		// searchDto ç”¨äºåˆ†é¡µçš„whereè¯­å¥åé¢
+		SearchOrderDto dto = new SearchOrderDto();
+		if (StringUtils.isNotBlank(param.getKeyword())) {
+			dto.setKeyword("%" + param.getKeyword() + "%");
+		}
+		if (StringUtils.isNotBlank(param.getSearch_status())) {
+			dto.setSearch_status(Integer.parseInt(param.getSearch_status()));
+		}
+		try {
+			SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+			if (StringUtils.isNotBlank(param.getFromTime())) {
+				dto.setFromTime(dateFormat.parse(param.getFromTime()));
+			}
+			if (StringUtils.isNotBlank(param.getToTime())) {
+				dto.setToTime(dateFormat.parse(param.getToTime()));
+			}
+		} catch (Exception e) {
+			throw new ParamException("ä¼ å…¥çš„æ—¥æœŸæ ¼å¼æœ‰é—®é¢˜ï¼Œæ­£ç¡®æ ¼å¼ä¸ºï¼šyyyy-MM-dd");
+		}
+		int count = mesOrderCustomerMapper.countBySearchDto(dto);
+		if (count > 0) {
+			List<MesOrder> orderList = mesOrderCustomerMapper.getPageListBySearchDto(dto, page);
+			return PageResult.<MesOrder>builder().total(count).data(orderList).build();
+		}
+
+		return PageResult.<MesOrder>builder().build();
 	}
 	
 	
@@ -79,10 +115,8 @@ public class OrderService {
 	
 	
 	
-	
-	
-	//»ñÈ¡id¼¯ºÏ
-	// »ñÈ¡id¼¯ºÏ
+	//ï¿½ï¿½È¡idï¿½ï¿½ï¿½ï¿½
+	// ï¿½ï¿½È¡idï¿½ï¿½ï¿½ï¿½
 	public List<String> createOrderIdsDefault(Long ocounts) {
 		if (ig == null) {
 			ig = new IdGenerator();
@@ -94,15 +128,15 @@ public class OrderService {
 		return list;
 	}
 	
-	//»ñÈ¡Êı¾İ¿âÖĞµÄÊıÁ¿
+	//ï¿½ï¿½È¡ï¿½ï¿½ï¿½İ¿ï¿½ï¿½Ğµï¿½ï¿½ï¿½ï¿½ï¿½
 	private Long getOrderCount() {
 		return mesOrderCustomerMapper.getOrderCount();
 	}
-		// 1 Ä¬ÈÏÉú³É´úÂë
-		// 2 ÊÖ¹¤Éú³É´úÂë
-		// idÉú³ÉÆ÷
+		// 1 Ä¬ï¿½ï¿½ï¿½ï¿½ï¿½É´ï¿½ï¿½ï¿½
+		// 2 ï¿½Ö¹ï¿½ï¿½ï¿½ï¿½É´ï¿½ï¿½ï¿½
+		// idï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 		class IdGenerator {
-			// ÊıÁ¿ÆğÊ¼Î»ÖÃ
+			// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¼Î»ï¿½ï¿½
 			private Long currentdbidscount;
 			private List<String> ids = new ArrayList<String>();
 			private String idpre;
@@ -164,12 +198,12 @@ public class OrderService {
 
 			//
 			private String getIdAfter(int addcount) {
-				// ÏµÍ³Ä¬ÈÏÉú³É5Î» ZX1700001
+				// ÏµÍ³Ä¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½5Î» ZX1700001
 				int goallength = 5;
-				// »ñÈ¡Êı¾İ¿âorderµÄ×ÜÊıÁ¿+1+Ñ­»·´ÎÊı(addcount)
+				// ï¿½ï¿½È¡ï¿½ï¿½ï¿½İ¿ï¿½orderï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½+1+Ñ­ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½(addcount)
 				int count = this.currentdbidscount.intValue() + 1 + addcount;
 				StringBuilder sBuilder = new StringBuilder("");
-				// ¼ÆËãÓë5Î»ÊıµÄ²îÖµ
+				// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½5Î»ï¿½ï¿½ï¿½Ä²ï¿½Öµ
 				int length = goallength - new String(count + "").length();
 				for (int i = 0; i < length; i++) {
 					sBuilder.append("0");

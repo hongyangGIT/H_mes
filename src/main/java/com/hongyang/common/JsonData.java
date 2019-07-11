@@ -32,8 +32,12 @@ public class JsonData {
         jsonData.data = object;
         return jsonData;
     }
-
     public static JsonData success() {
+        JsonData jsonData = new JsonData(true);
+        return jsonData;
+    }
+
+    public static JsonData page() {
         return new JsonData(true);
     }
 

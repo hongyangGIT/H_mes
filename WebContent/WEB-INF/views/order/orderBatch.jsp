@@ -2,10 +2,12 @@
 <html>
 <head>
     <title>订单管理</title>
-    <jsp:include page="/common/backend_common.jsp"/>
-    <jsp:include page="/common/page.jsp"/>
+<%--     <jsp:include page="/common/backend_common.jsp"/> --%>
+<%--     <jsp:include page="/common/page.jsp"/> --%>
 </head>
-<%@include file="/template/orderBatchListTemplate.jsp" %>
+<%@ include file="/common/backend_common.jsp" %>
+<%@ include file="/common/page.jsp" %>
+<%@ include file="/template/orderBatchListTemplate.jsp" %>
 <body class="no-skin" youdao="bind" style="background: white">
 <input id="gritter-light" checked="" type="checkbox" class="ace ace-switch ace-switch-5"/>
 <div class="page-header">
@@ -30,7 +32,7 @@
             <div>
                 <div id="dynamic-table_wrapper" class="dataTables_wrapper form-inline no-footer">
                     <div class="row">
-                        <div class="col-xs-6">
+                        <div class="col-xs-12">
                             <div class="dataTables_length" id="dynamic-table_length"><label>
                                 展示
                                 <select id="pageSize" name="dynamic-table_length" aria-controls="dynamic-table" class="form-control input-sm">
@@ -39,6 +41,32 @@
                                     <option value="50">50</option>
                                     <option value="100">100</option>
                                 </select> 条记录 </label>
+                                </label> <input id="keyword" type="search" name="keyword"
+										class="form-control input-sm" placeholder="关键词"
+										aria-controls="dynamic-table"> <label>
+										&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;是否启用 
+									<input type="hidden" name="search_status" id="search_status" value="0"/>
+									<!-- 
+									<select
+										id="search_status" name="search_status"
+										aria-controls="dynamic-table" class="form-control input-sm">
+											<option value="0">未启动</option>
+											<option value="1">已启动</option>
+									</select>
+									-->
+									</label> <input id="fromTime" type="search" name="fromTime"
+										class="form-control input-sm datepicker" placeholder="开始时间"
+										aria-controls="dynamic-table"> ~ <input id="toTime"
+										type="search" name="toTime"
+										class="form-control input-sm datepicker" placeholder="结束时间"
+										aria-controls="dynamic-table">
+									&nbsp;&nbsp;&nbsp;&nbsp;
+									<button class="btn btn-info fa fa-check research"
+										style="margin-bottom: 6px;" type="button">刷新</button>
+									&nbsp;&nbsp;&nbsp;&nbsp;
+									<button class="btn btn-info fa fa-check batchStart-btn"
+										style="margin-bottom: 6px;" type="button">批量启动</button>
+								</div>
                             </div>
                         </div>
                     </div>
@@ -46,22 +74,29 @@
                            aria-describedby="dynamic-table_info" style="font-size:14px">
                         <thead>
                         <tr role="row">
-                            <th tabindex="0" aria-controls="dynamic-table" rowspan="1" colspan="1">
-                                姓名
-                            </th>
-                            <th tabindex="0" aria-controls="dynamic-table" rowspan="1" colspan="1">
-                                所属部门
-                            </th>
-                            <th tabindex="0" aria-controls="dynamic-table" rowspan="1" colspan="1">
-                                邮箱
-                            </th>
-                            <th tabindex="0" aria-controls="dynamic-table" rowspan="1" colspan="1">
-                                电话
-                            </th>
-                            <th tabindex="0" aria-controls="dynamic-table" rowspan="1" colspan="1">
-                                状态
-                            </th>
-                            <th class="sorting_disabled" rowspan="1" colspan="1" aria-label=""></th>
+                            <input type="hidden" id="id" name="id" class="id" />
+									<th tabindex="0" class="batchStart-th" aria-controls="dynamic-table" rowspan="1"
+										colspan="1">批量选择</th>
+									<th tabindex="0" aria-controls="dynamic-table" rowspan="1"
+										colspan="1">产品自编号</th>
+									<th tabindex="0" aria-controls="dynamic-table" rowspan="1"
+										colspan="1">产品名称</th>
+									<th tabindex="0" aria-controls="dynamic-table" rowspan="1"
+										colspan="1">图号</th>
+									<th tabindex="0" aria-controls="dynamic-table" rowspan="1"
+										colspan="1">材料名称</th>
+									<th tabindex="0" aria-controls="dynamic-table" rowspan="1"
+										colspan="1">材料来源</th>
+									<th tabindex="0" aria-controls="dynamic-table" rowspan="1"
+										colspan="1">来料预期</th>
+									<th tabindex="0" aria-controls="dynamic-table" rowspan="1"
+										colspan="1">合同交期</th>
+									<th tabindex="0" aria-controls="dynamic-table" rowspan="1"
+										colspan="1">状态</th>
+									<th tabindex="0" aria-controls="dynamic-table" rowspan="1"
+										colspan="1">备注</th>
+									<th class="sorting_disabled" rowspan="1" colspan="1"
+										aria-label="">操作</th>
                         </tr>
                         </thead>
                         <tbody id="orderList">

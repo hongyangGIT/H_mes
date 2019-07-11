@@ -21,8 +21,6 @@
     <mvc:resources location="/ztree/" mapping="/ztree/**"/>
     <mvc:resources location="/WEB-INF/views/order/" mapping="/order/**"/> 
     
-     <!-- 配置全局上下文 -->
-    <bean id="application" class="com.hongyang.common.ApplicationContextHelper"></bean>
     <!-- 配置全局异常类 -->
     <bean class="com.hongyang.common.SpringExceptionResolver"></bean>
 	<!-- 配置视图解析器 -->

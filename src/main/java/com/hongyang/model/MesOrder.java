@@ -2,8 +2,12 @@ package com.hongyang.model;
 
 import java.util.Date;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.NoArgsConstructor;
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class MesOrder {
     private Integer id;
 

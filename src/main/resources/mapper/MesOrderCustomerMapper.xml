@@ -32,4 +32,39 @@
   	COUNT(1)
   	FROM mes_order
   </select>
+  
+  <select id="countBySearchDto" parameterType="map"
+		resultType="int">
+		SELECT count(1)
+		FROM mes_order
+		<include refid="queryConditions" />
+	</select>
+	<!--分页 -->
+	<select id="getPageListBySearchDto" parameterType="map"
+		resultMap="BaseResultMap">
+		SELECT
+		<include refid="Base_Column_List" />
+		FROM mes_order
+		<include refid="queryConditions" />
+		ORDER BY order_operate_time DESC,id DESC
+		limit #{page.offset}, #{page.pageSize}
+	</select>
+	
+	<!-- where：帮助你增加一个where拼接，解下来将第一个出现的and去掉 -->
+	<sql id="queryConditions">
+		<where>
+			<if test="dto.search_status != null">
+				AND order_status = #{dto.search_status}
+			</if>
+			<if test="dto.keyword != null and dto.keyword != ''">
+				AND ((order_id like #{dto.keyword}) or (order_clientname like #{dto.keyword}) or
+				(order_productname like #{dto.keyword}) or (order_contractid like
+				#{dto.keyword})or (order_materialname like #{dto.keyword})or (order_materialsource like
+				#{dto.keyword}) or (order_imgid like #{dto.keyword}))
+			</if>
+			<if test="dto.fromTime != null and dto.toTime != null">
+				AND order_committime BETWEEN #{dto.fromTime} AND #{dto.toTime}
+			</if>
+		</where>
+	</sql>
 </mapper>

@@ -6,6 +6,8 @@ import javax.validation.constraints.Min;
 
 import org.hibernate.validator.constraints.NotBlank;
 
+import com.hongyang.model.MesOrder;
+
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -14,18 +16,18 @@ import lombok.ToString;
 @Setter
 @Getter
 public class MesOrderVo{
-	//½ÓÊÕÅúÁ¿Éú³ÉµÄorder¸öÊı
+	//æ¥æ”¶æ‰¹é‡ç”Ÿæˆçš„orderä¸ªæ•°
 	@Min(1)
-	private Integer count=1;//Õâ¸öÊı×Ö¾ÍËãÊÇÃ»ÓĞÖµ£¬Ä¬ÈÏÊÇ1
+	private Integer count=1;//è¿™ä¸ªæ•°å­—å°±ç®—æ˜¯æ²¡æœ‰å€¼ï¼Œé»˜è®¤æ˜¯1
 	
     private Integer id;
 
     private String orderId;
-    @NotBlank(message="¿Í»§Ãû³Æ²»¿ÉÒÔÎª¿Õ")
+
     private String orderClientname;
-    @NotBlank(message="Áã¼şÃû³Æ²»¿ÉÒÔÎª¿Õ")
+
     private String orderProductname;
-    @NotBlank(message="ºÏÍ¬±àºÅ²»¿ÉÒÔÎª¿Õ")
+
     private String orderContractid;
 
     private String orderImgid;
@@ -48,10 +50,10 @@ public class MesOrderVo{
 
     private String orderRemark;
     
-    @NotBlank(message="À´ÁÏÈÕÆÚ²»¿ÉÒÔÎª¿Õ")
+    @NotBlank(message="æ¥æ–™æ—¥æœŸä¸å¯ä»¥ä¸ºç©º")
     private String comeTime;
     
-    @NotBlank(message="Ìá½»ÈÕÆÚ²»¿ÉÒÔÎª¿Õ")
+    @NotBlank(message="æäº¤æ—¥æœŸä¸å¯ä»¥ä¸ºç©º")
     private String commitTime;
     
 }

@@ -1,53 +1,6 @@
 $(function(){
-	var ids="";
-	//批量启动点击事件
-	$(".batchStart-btn").click(function(){
-		//拿到所有被选中的id
-		var checks=$(".batchStart-check:checked");
-		if(checks!=null&&checks.length>0){
-			$.each(checks,function(i,check){
-//				console.log($(check).closest("tr").data("id")); h5
-//				console.log($(check).closest("tr").attr("data-id"));
-				var id=$(check).closest("tr").attr("data-id");
-				ids+=id+"&";
-				
-			});
-			//拼装ids
-			ids=ids.substr(0,ids.length-1);
-			//发送ajax请求
-			$.ajax({
-				url : "/order/orderBatchStart.json",
-				data : {//左面是数据名称-键，右面是值
-					ids:ids
-				},
-				type : 'POST',
-				success : function(result) {//jsondata  jsondata.getData=pageResult  pageResult.getData=list
-					
-					loadOrderList();
-				}
-			});
-			ids="";//111&122&111&122
-		}
-	});
-	$(".batchStart-th").click(function(){
-		var checks=$(".batchStart-check");
-		$.each(checks,function(i,input){
-			//状态反选
-//			console.log($(input).attr("checked"));调试测试
-//			var checked=input.checked;
-//			console.log(i+"--"+checked);
-			//true-false  false-true  使用三目运算符
-			input.checked=input.checked==true?false:true;
-		});
-	});	
-	
-	
-	
-	
-	
-	
-	//定义全局变量
-	//分页
+	//执行分页逻辑
+	//定义一些全局变量
 	var orderMap = {};//准备一个map格式的仓库，等待存储从后台返回过来的数据
 	var optionStr;//选项参数
 	var pageSize;//页码条数
@@ -57,19 +10,21 @@ $(function(){
 	var search_status;//查询状态
 	var fromTime;
 	var toTime;
-	
 	//加载模板内容进html
-	var orderBatchListTemplate=$("#orderBatchListTemplate").html();
-	//使用mustache模板加载内容
-	Mustache.parse(orderBatchListTemplate);
+	//获取模板内容
+	var orderListTemplate = $("#orderListTemplate").html();
+	//将内容交给mustache来处理
+	Mustache.parse(orderListTemplate);
+	
+	//调用分页函数
 	loadOrderList();
-	//点击刷新的时候也需要调用分页函数
+	//点击刷新时也要调用分页函数
 	$(".research").click(function(e) {
 		e.preventDefault();
 		$("#orderPage .pageNo").val(1);
 		loadOrderList();
 	});
-	//定义调用分页函数，一定是当前的查询条件下（keyword，search_status。。）的分页
+	//定义调用分页函数，一定包含查询条件keyword，search_status。。
 	function loadOrderList(urlnew) {
 		//获取页面当前需要查询的还留在页码上的信息
 		//在当前页中找到需要调用的页码条数
@@ -84,7 +39,7 @@ $(function(){
 		keyword = $("#keyword").val();
 		fromTime = $("#fromTime").val();
 		toTime = $("#toTime").val();
-		//search_status = $("#search_status").val();
+		search_status = $("#search_status").val();
 		//发送请求
 		$.ajax({
 			url : url,
@@ -94,7 +49,7 @@ $(function(){
 				keyword : keyword,
 				fromTime : fromTime,
 				toTime : toTime,
-				//search_status : search_status,
+				search_status : search_status,
 			},
 			type : 'POST',
 			success : function(result) {//jsondata  jsondata.getData=pageResult  pageResult.getData=list
@@ -104,7 +59,7 @@ $(function(){
 		});
 	}
 	
-	//渲染所有的mustache模板页面
+	//渲染所有模板
 	//result中的存储数据，就是一个list<MesOrder>集合,是由service访问数据库后返回给controller的数据模型
 	function renderOrderListAndPage(result, url) {
 		//从数据库返回过来的数据集合result
@@ -121,7 +76,7 @@ $(function(){
 //				//Mustache.render({"name":"李四","gender":"男"});
 //				//Mustache.render(list=new ArrayList<String>(){"a01","a02"},{"name":"list[i].name","gender":list[i].gender});
 				var rendered = Mustache.render(
-						orderBatchListTemplate,//<script id="orderListTemplate" type="x-tmpl-mustache">
+								orderListTemplate,//<script id="orderListTemplate" type="x-tmpl-mustache">
 								{
 									"orderList" : result.data.data,//{{#orderList}}--List-(result.data.data-list<MesOrder>)
 									"come_date" : function() {
@@ -184,58 +139,6 @@ $(function(){
 			showMessage("获取订单列表", result.msg, false);
 		}
 	}
-	
-	
-	
-	
-	
-	
-	//添加
-	$(".order-add").click(function(){
-		//弹出框
-		$("#dialog-order-form").dialog(
-				{
-					modal : true,//背景不可点击
-					title : "新建订单",//模态框标题
-					open : function(event, ui) {
-						$(".ui-dialog").css("width", "700px");//增加模态框的宽高
-						$(".ui-dialog-titlebar-close",
-								$(this).parent()).hide();//关闭默认叉叉
-						optionStr = "";
-						$("#orderBatchForm")[0].reset();//清空模态框--jquery 将指定对象封装成了dom对象
-					},
-					buttons : {
-						"添加" : function(e) {
-							//阻止一下默认事件
-							e.preventDefault();
-							//发送新增order的数据和接收添加后的回收信息
-							//添加操作，将来会和更新操作共用
-							updateOrder(true, function(data) {
-								//增加成功了
-								//提示增加用户成功信息
-								showMessage("新增订单", data.msg,
-										true);
-								$("#dialog-order-form").dialog(
-										"close");
-	                         	loadOrderList();//根据参数查看
-							}, function(data) {
-								//增加失败了
-								//						alert("添加失败了");
-								//信息显示
-								showMessage("新增订单", data.msg,
-										false);
-								//						$("#dialog-order-form").dialog("close");
-							});
-						},
-						"取消" : function() {
-							$("#dialog-order-form").dialog(
-									"close");
-						}
-					}
-				});
-	});
-	
-	
 	function bindOrderClick(){
 		   $(".order-edit").click(function(e) {
 			//阻止默认事件
@@ -246,7 +149,7 @@ $(function(){
          var orderId = $(this).attr("data-id");
 			//弹出order的修改弹窗 
          $("#dialog-orderUpdate-form").dialog({
-             modal: true,
+             model: true,
              title: "编辑订单",
              open: function(event, ui) {
           	    $(".ui-dialog").css("width","600px");
@@ -293,8 +196,9 @@ $(function(){
              }
          });
      });
-	} 
-	//更新  添加
+	   } 
+	
+	//更新
 	function updateOrder(isCreate, successCallbak, failCallbak) {
 		$.ajax({
 			url : isCreate ? "/order/insert.json"
@@ -321,6 +225,7 @@ $(function(){
 			}
 		});
 	}
+	
 //////////////////////////////////////////////////////////////
 	//日期显示
 	$('.datepicker').datepicker({
@@ -328,4 +233,5 @@ $(function(){
 		showOtherMonths : true,
 		selectOtherMonths : false
 	});
+	
 });

@@ -44,7 +44,8 @@
                                 </label> <input id="keyword" type="search" name="keyword"
 										class="form-control input-sm" placeholder="关键词"
 										aria-controls="dynamic-table"> <label>
-										&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;是否启用 
+										&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<!-- 										是否启用  -->
 									<input type="hidden" name="search_status" id="search_status" value="0"/>
 									<!-- 
 									<select
@@ -112,6 +113,7 @@
     </div>
 </div>
 <%@include file="orderBatchForm.jsp" %>
-<script type="text/javascript" src="orderBatch.js"></script>
+<%@include file="orderUpdateForm.jsp" %>
 </body>
+<script type="text/javascript" src="orderBatch.js"></script>
 </html>

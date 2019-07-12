@@ -20,6 +20,7 @@
     <mvc:resources location="/assets/" mapping="/assets/**"/>
     <mvc:resources location="/ztree/" mapping="/ztree/**"/>
     <mvc:resources location="/WEB-INF/views/order/" mapping="/order/**"/> 
+    <mvc:resources location="/WEB-INF/views/plan/" mapping="/plan/**"/> 
     
     <!-- 配置全局异常类 -->
     <bean class="com.hongyang.common.SpringExceptionResolver"></bean>

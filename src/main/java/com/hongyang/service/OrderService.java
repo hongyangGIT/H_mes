@@ -10,6 +10,7 @@ import javax.annotation.Resource;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
+import com.google.common.base.Preconditions;
 import com.hongyang.beans.PageQuery;
 import com.hongyang.beans.PageResult;
 import com.hongyang.dao.MesOrderCustomerMapper;
@@ -26,12 +27,16 @@ import com.hongyang.util.MyStringUtils;
 @Service
 public class OrderService {
 	@Resource
-	private MesOrderMapper merOrderMapper;
+	private MesOrderMapper mesOrderMapper;
 	@Resource
 	private MesOrderCustomerMapper mesOrderCustomerMapper;
+	
+	@Resource
+	private PlanService planService;
 	//自定义一个ID生成器
 	private IdGenerator ig=new IdGenerator();
 
+	//添加
 	public void insertOrderBatch(MesOrderVo orderVo) {
 		//校验
 		BeanValidator.check(orderVo);
@@ -59,14 +64,54 @@ public class OrderService {
 						.orderHurrystatus(orderVo.getOrderHurrystatus())
 						.orderStatus(orderVo.getOrderStatus())
 						.orderRemark(orderVo.getOrderRemark()).build();
-				
-				merOrderMapper.insertSelective(mesOrder);
+				mesOrder.setOrderOperator("hongyang");
+				mesOrder.setOrderOperateIp("127.0.0.1");
+				mesOrder.setOrderOperateTime(new Date());
+				// 批量添加未启动订单
+				if (mesOrder.getOrderStatus() ==1) {
+					planService.prePlan(mesOrder);
+				}
+				mesOrderMapper.insertSelective(mesOrder);
 			} catch (Exception e) {
 				throw new SysMineException("创建过程出现问题");
 			}
 		}
 	}
+	//修改
+	public void updateOrder(MesOrderVo orderVo) {
+		
+		BeanValidator.check(orderVo);
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		//判断该id有没有
+		MesOrder before = mesOrderMapper.selectByPrimaryKey(orderVo.getId());
+		//没有就出异常返回界面
+		Preconditions.checkNotNull(before, "待更新的材料不存在");
+		try {
+			//将VO转换成PO
+			MesOrder mesOrder = MesOrder.builder()
+					.id(orderVo.getId())
+					.orderClientname(orderVo.getOrderClientname())//
+					.orderProductname(orderVo.getOrderProductname())
+					.orderContractid(orderVo.getOrderContractid())//
+					.orderImgid(orderVo.getOrderImgid())
+					.orderMaterialname(orderVo.getOrderMaterialname())
+					.orderCometime(MyStringUtils.string2Date(orderVo.getComeTime(), null))//
+					.orderCommittime(MyStringUtils.string2Date(orderVo.getCommitTime(), null))
+					.orderInventorystatus(orderVo.getOrderInventorystatus())
+					.orderStatus(orderVo.getOrderStatus())//
+					.orderMaterialsource(orderVo.getOrderMaterialsource())
+					.orderHurrystatus(orderVo.getOrderHurrystatus())
+					.orderStatus(orderVo.getOrderStatus())
+					.orderRemark(orderVo.getOrderRemark()).build();
+			
+			mesOrderMapper.updateByPrimaryKeySelective(mesOrder);
+		} catch (Exception e) {
+			throw new SysMineException("更改过程出现问题");
+		}
+		
+	}
 	
+	//分页查询刷新
 	public PageResult<MesOrder> searchPageList(SearchOrderParam param, PageQuery page) {
 		///校验
 		BeanValidator.check(page);
@@ -234,4 +279,14 @@ public class OrderService {
 				return "IdGenerator [ids=" + ids + "]";
 			}
 		}
+		public void orderBatchStart(String ids) {
+			if(ids!=null&&ids.length()>0) {
+				// 批量处理的sqlSession代理
+				String[] idArray = ids.split("&");
+				mesOrderCustomerMapper.batchStart(idArray);
+				//批量启动未启动计划
+				planService.startPlansByOrderIds(idArray);
+			}
+		}
+		
 }

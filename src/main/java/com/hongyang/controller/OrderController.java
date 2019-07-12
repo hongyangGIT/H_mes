@@ -24,7 +24,12 @@ public class OrderController {
 	public String orderBatchPage() {
 		return FPATH+"orderBatch";
 	}
-	
+	//查看订单
+	@RequestMapping("/order.page")
+	public String orderPage() {
+		return FPATH+"order";
+	}
+	//添加
 	@ResponseBody
 	@RequestMapping("/insert.json")
 	public JsonData insertOrderAjax(MesOrderVo orderVo) {
@@ -34,13 +39,27 @@ public class OrderController {
 		orderService.insertOrderBatch(orderVo);
 		return JsonData.success();
 	}
+	//修改
+	@RequestMapping("/update.json")
+	@ResponseBody
+	public JsonData updateOrderAjax(MesOrderVo orderVo) {
+		orderService.updateOrder(orderVo);
+		return JsonData.success();
+	}
+	//批量启动
+	@RequestMapping("/orderBatchStart.json")
+	@ResponseBody
+	public JsonData orderBatchStartAjax(String ids) {
+//		System.out.println(ids);
+		orderService.orderBatchStart(ids);
+		return JsonData.success();
+	}
 	
+	//分页
 	@ResponseBody
 	@RequestMapping("/order.json")
 	public JsonData searchPageAjax(SearchOrderParam param, PageQuery page) {
-		System.out.println("进来了");
 		PageResult<MesOrder> pr=orderService.searchPageList(param,page);
 		return JsonData.success(pr);
-
 	}
 }

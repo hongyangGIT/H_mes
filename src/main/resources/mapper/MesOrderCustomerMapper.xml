@@ -50,6 +50,18 @@
 		limit #{page.offset}, #{page.pageSize}
 	</select>
 	
+	<update id="batchStart" parameterType="list">
+		update mes_order set order_status=1
+		  where 
+		  id in
+		  <foreach item="item" index="index" collection="list"
+		      open="(" separator="," close=")">
+		        #{item}
+		  </foreach>
+	
+	</update>
+	
+	
 	<!-- where：帮助你增加一个where拼接，解下来将第一个出现的and去掉 -->
 	<sql id="queryConditions">
 		<where>

@@ -210,7 +210,7 @@ $(function(){
 				//数据执行成功返回的消息
 				if (result.ret) {
 					console.log(66);
-                	//loadOrderList(); // 带参数回调
+                	loadOrderList(); // 带参数回调
 					//带参数回调
 					if (successCallbak) {
 						

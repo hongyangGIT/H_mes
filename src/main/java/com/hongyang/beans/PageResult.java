@@ -3,6 +3,7 @@ package com.hongyang.beans;
 import java.util.List;
 
 import com.google.common.collect.Lists;
+import com.hongyang.model.MesOrder;
 
 import lombok.Builder;
 import lombok.Getter;

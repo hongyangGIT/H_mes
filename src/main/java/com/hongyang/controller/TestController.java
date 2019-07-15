@@ -33,4 +33,5 @@ public class TestController {
 	public String deptPage() {
 		return "dept";
 	}
+	
 }

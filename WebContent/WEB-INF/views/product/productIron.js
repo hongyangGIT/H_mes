@@ -1,68 +1,4 @@
 $(function(){
-	//批量到库逻辑
-	var ids="";
-	$(".productStart-btn").click(function(){
-		//获取被选中的id
-		var checks=$(".batchStart-check:checked");
-		if(checks!=null&&checks.length>0){
-			$.each(checks,function(i,check){
-//				console.log($(check).closest("tr").data("id")); h5
-//				console.log($(check).closest("tr").attr("data-id"));
-				var id=$(check).closest("tr").attr("data-id");
-				ids+=id+"&";
-				
-			});
-			//拼装ids
-			ids=ids.substr(0,ids.length-1);
-//			alert(ids);
-			//发送ajax请求
-			$.ajax({
-				url : "/product/productStart.json",
-				data : {//左面是数据名称-键，右面是值
-					ids:ids
-				},
-				type : 'POST',
-				success : function(result) {//jsondata  jsondata.getData=pageResult  pageResult.getData=list
-					alert(666)
-					loadProductList();
-				}
-			});
-			ids="";//111&122&111&122
-			
-		}
-	});
-	
-	
-	
-	$(".batchStart-th").click(function(){
-		var checks=$(".batchStart-check");
-		$.each(checks,function(i,input){
-			//状态反选
-//			console.log($(input).attr("checked"));调试测试
-//			var checked=input.checked;
-//			console.log(i+"--"+checked);
-			//true-false  false-true  使用三目运算符
-			input.checked=input.checked==true?false:true;
-		});
-	});	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 	//执行分页逻辑
 	//定义一些全局变量
 	var productMap = {};//准备一个map格式的仓库，等待存储从后台返回过来的数据
@@ -71,7 +7,7 @@ $(function(){
 	var url;//查询url
 	var keyword;//关键字
 	var search_materialsource;//查询状态  钢材  废材  外协件 外购件  "" 
-	
+	var search_status;
 	//加载模板内容进html
 	//获取模板内容
 	var productListTemplate = $("#productListTemplate").html();
@@ -96,10 +32,11 @@ $(function(){
 		if (urlnew) {
 			url = urlnew;
 		} else {
-			url = "/product/product.json";
+			url = "/product/productIron.json";
 		}
 		keyword = $("#keyword").val();
 		search_materialsource = $("#search_materialsource").val();
+		search_status=$("#search_status").val();
 		//发送请求
 		$.ajax({
 			url : url,
@@ -108,6 +45,7 @@ $(function(){
 				pageSize : pageSize,
 				keyword : keyword,
 				search_materialsource : search_materialsource,
+				search_status:search_status
 			},
 			type : 'POST',
 			success : function(result) {//jsondata  jsondata.getData=pageResult  pageResult.getData=list
@@ -267,8 +205,4 @@ $(function(){
 			}
 		});
 	}
-	
-	
-	
-	
 });

@@ -56,7 +56,17 @@
 		limit #{page.offset}, #{page.pageSize}
 	</select>
 	
+<!-- 	批量到库 -->
+	<update id="productStart" parameterType="list">
+		update mes_product set product_status=1
+		  where 
+		  id in
+		  <foreach item="item" index="index" collection="list"
+		      open="(" separator="," close=")">
+		        #{item}
+		  </foreach>
 	
+	</update>
 	<!-- where：帮助你增加一个where拼接，解下来将第一个出现的and去掉 -->
 	<sql id="queryConditions">
 		<where>
@@ -72,9 +82,56 @@
 			<if test="dto.keyword != null and dto.keyword != ''">
 				AND ((product_id like #{dto.keyword}) or (p_id like #{dto.keyword}) or
 				(product_materialname like #{dto.keyword}) or (product_materialsource like
-				#{dto.keyword}))
+				#{dto.keyword}) or (product_heatid like #{dto.keyword}))
 			</if>
 			
 		</where>
 	</sql>
+	
+	
+<!-- 	钢锭条数查询 -->
+	 <select id="countBySearchDto_Iron" parameterType="map"
+		resultType="int">
+		SELECT count(1)
+		FROM mes_product
+		<include refid="queryConditions_Iron" />
+	</select>
+	
+	<!--钢锭查询分页 -->
+	<select id="getPageListBySearchDto_Iron" parameterType="map"
+		resultMap="BaseResultMap">
+		SELECT
+		<include refid="Base_Column_List" />
+		FROM mes_product
+		<include refid="queryConditions_Iron" />
+		ORDER BY product_operate_time DESC,id DESC
+		limit #{page_Iron.offset}, #{page_Iron.pageSize}
+	</select>
+	
+	<!-- where：帮助你增加一个where拼接，解下来将第一个出现的and去掉 -->
+	<sql id="queryConditions_Iron">
+		<where>
+			AND product_materialsource='钢锭'
+			<if test="dto_Iron.search_status != null">
+				AND product_status = #{dto_Iron.search_status}
+			</if>
+			
+			<if test="dto_Iron.keyword != null and dto_Iron.keyword != ''">
+				AND ((product_id like #{dto_Iron.keyword}) or (p_id like #{dto_Iron.keyword}) or
+				(product_materialname like #{dto_Iron.keyword}) or (product_materialsource like
+				#{dto_Iron.keyword}) or (product_heatid like #{dto_Iron.keyword}))
+			</if>
+			
+		</where>
+	</sql>
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 </mapper>

@@ -41,12 +41,12 @@ public class ProductController {
 		return FPATH+"product";
 	}
 	
-	//批量到库分页
+	//批量到库与到库查询分页
 	@RequestMapping("/product.json")
 	@ResponseBody
 	public JsonData searchProductAjax(SearchProductParam param,PageQuery page) {
-		System.out.println("------------------------");
-		System.out.println(param);
+//		System.out.println("------------------------");
+//		System.out.println(param);
 		PageResult<MesProduct> pr=productService.searchProductAjax(param,page);
 		return JsonData.success(pr);
 	}
@@ -54,9 +54,55 @@ public class ProductController {
 	@RequestMapping("/update.json")
 	@ResponseBody
 	public JsonData updateAjax(MesProductVo mesProductVo) {
-//		System.out.println("-----------------------");
-//		System.out.println(mesProductVo);
 		productService.updateAjax(mesProductVo);
+		return JsonData.success();
+	}
+	
+	//到库查询页面
+	@RequestMapping("/productCome.page")
+	public String productComePage() {
+		return FPATH+"productCome";
+	}
+	
+	//批量到库逻辑
+	@RequestMapping("/productStart.json")
+	@ResponseBody
+	public JsonData productStart(String ids) {
+		productService.productStart(ids);
+		return JsonData.success();
+	}
+	
+	//钢锭查询页面
+	@RequestMapping("/productIron.page")
+	public String productIronPage() {
+		return FPATH+"productIron";
+	}
+	//钢锭查询页面分页
+	@RequestMapping("/productIron.json")
+	@ResponseBody
+	public JsonData searchProductIronAjax(SearchProductParam param,PageQuery page) {
+//		System.out.println("------------------------");
+//		System.out.println(param);
+		PageResult<MesProduct> pr=productService.searchProductIronAjax(param,page);
+		return JsonData.success(pr);
+	}
+	
+	//材料绑定页面
+	@RequestMapping("/productBindList.page")
+	public String productBindListPage() {
+		return FPATH+"productBindList";
+	}
+//	//真正的绑定页面
+//	@RequestMapping("/bind.page")
+//	public String bindPage() {
+//		return FPATH+"bindPage";
+//	}
+	//真正的绑定方法逻辑
+	@RequestMapping("/realBind.json")
+	@ResponseBody
+	public JsonData realBindAjax(String ids) {
+		System.out.println("---------------------------ids------------------------");
+		System.out.println(ids);
 		return JsonData.success();
 	}
 }

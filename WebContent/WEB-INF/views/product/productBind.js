@@ -1,68 +1,5 @@
 $(function(){
-	//批量到库逻辑
-	var ids="";
-	$(".productStart-btn").click(function(){
-		//获取被选中的id
-		var checks=$(".batchStart-check:checked");
-		if(checks!=null&&checks.length>0){
-			$.each(checks,function(i,check){
-//				console.log($(check).closest("tr").data("id")); h5
-//				console.log($(check).closest("tr").attr("data-id"));
-				var id=$(check).closest("tr").attr("data-id");
-				ids+=id+"&";
-				
-			});
-			//拼装ids
-			ids=ids.substr(0,ids.length-1);
-//			alert(ids);
-			//发送ajax请求
-			$.ajax({
-				url : "/product/productStart.json",
-				data : {//左面是数据名称-键，右面是值
-					ids:ids
-				},
-				type : 'POST',
-				success : function(result) {//jsondata  jsondata.getData=pageResult  pageResult.getData=list
-					alert(666)
-					loadProductList();
-				}
-			});
-			ids="";//111&122&111&122
-			
-		}
-	});
-	
-	
-	
-	$(".batchStart-th").click(function(){
-		var checks=$(".batchStart-check");
-		$.each(checks,function(i,input){
-			//状态反选
-//			console.log($(input).attr("checked"));调试测试
-//			var checked=input.checked;
-//			console.log(i+"--"+checked);
-			//true-false  false-true  使用三目运算符
-			input.checked=input.checked==true?false:true;
-		});
-	});	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+	$(".two").hide();
 	//执行分页逻辑
 	//定义一些全局变量
 	var productMap = {};//准备一个map格式的仓库，等待存储从后台返回过来的数据
@@ -71,12 +8,17 @@ $(function(){
 	var url;//查询url
 	var keyword;//关键字
 	var search_materialsource;//查询状态  钢材  废材  外协件 外购件  "" 
-	
+	var search_status;
+	 var productId_F;//存放productid-父id
 	//加载模板内容进html
 	//获取模板内容
 	var productListTemplate = $("#productListTemplate").html();
 	//将内容交给mustache来处理
 	Mustache.parse(productListTemplate);
+	
+	var unboundedTemplate=$("#unboundedTemplate").html();
+	
+	Mustache.parse(unboundedTemplate);
 	
 	//调用分页函数
 	loadProductList();
@@ -100,6 +42,7 @@ $(function(){
 		}
 		keyword = $("#keyword").val();
 		search_materialsource = $("#search_materialsource").val();
+		search_status=1;
 		//发送请求
 		$.ajax({
 			url : url,
@@ -108,6 +51,7 @@ $(function(){
 				pageSize : pageSize,
 				keyword : keyword,
 				search_materialsource : search_materialsource,
+				search_status:search_status
 			},
 			type : 'POST',
 			success : function(result) {//jsondata  jsondata.getData=pageResult  pageResult.getData=list
@@ -167,7 +111,7 @@ $(function(){
 			} else {
 				$('#productList').html('');
 			}
-			bindOrderClick();//更新操作
+			bindProductClick();//点击绑定
 			var pageSize = $("#pageSize").val();
 			var pageNo = $("#productPage .pageNo").val() || 1;
 			//渲染页码
@@ -182,65 +126,128 @@ $(function(){
 			showMessage("获取订单列表", result.msg, false);
 		}
 	}
-	//点击修改
-	function bindOrderClick(){
-		   $(".order-edit").click(function(e) {
+//	//点击绑定
+	function bindProductClick(){
+		   $(".bind-btn").click(function(e) {
 			 //阻止默认事件
 	         e.preventDefault();
 				//阻止事件传播
 	         e.stopPropagation();
-	     	//获取productid
+	       //获取productid
 	         var productId = $(this).attr("data-id");
-	         $("#dialog-productUpdate-form").dialog({
-	             modal: true,
-	             title: "编辑订单",
-	             open: function(event, ui) {
-	           	    $(".ui-dialog").css("width","600px");
-	                  $(".ui-dialog-titlebar-close", $(this).parent()).hide();
-	                	//将form表单中的数据清空，使用jquery转dom对象
-	                  $("#productUpdateForm")[0].reset();
-	                //拿到map中以键值对，id-product对象结构的对象,用来向form表单中传递数据
-	                  var targetProduct = productMap[productId];
-	                //如果取出这个对象
-	                  if (targetProduct) {
-	 						/////////////////////////////////////////////////////////////////
-	                	  	$("#input-Id").val(targetProduct.id);
-	 						$("#input-productId").val(targetProduct.productId);
-	 						$("#input-productHeatid").val(targetProduct.productHeatid);
-	 						$("#input-productImgid").val(targetProduct.productImgid);
-	 						$("#input-productMaterialname").val(targetProduct.productMaterialname);
-	 						$("#input-productMaterialsource").val(targetProduct.productMaterialsource);
-	 						$("#input-productTargetweight").val(targetProduct.productTargetweight);
-	 						$("#input-productRealweight").val(targetProduct.productRealweight);
-	 						$("#input-productLeftweight").val(targetProduct.productLeftweight);
-	 						$("#input-productIrontypeweight").val(targetProduct.productIrontypeweight);
-	 						$("#input-productIrontype").val(targetProduct.productIrontype);
-	 						$("#input-productStatus").val(targetProduct.productStatus);
-	 						$("#input-productRemark").val(targetProduct.productRemark);
-	 						/////////////////////////////////////////////////////////////////
-	                  }
-	                  
-	              },
-	              buttons : {
-	                  "更新": function(e) {
-	                      e.preventDefault();
-	                      updateOrder( function (data) {
-	                          $("#dialog-productUpdate-form").dialog("close");
-	          				$("#productPage .pageNo").val(1);
-	          				 showMessage("更新订单", data.msg, true);
-	          				loadProductList();
-	                      }, function (data) {
-	                          showMessage("更新订单", data.msg, false);
-	                      })
-	                  },
-	                  "取消": function (data) {
-	                      $("#dialog-productUpdate-form").dialog("close");
-	                  }
-	              }
-	             
-	         });
+	        if(productId){
+	        	productId_F=productId;
+	        }
+	         
+	        $(".one").hide();
+	        $(".two").show();
+	      //拿到map中以键值对，id-product对象结构的对象,用来向form表单中传递数据
+            var targetProduct = productMap[productId];
+            //如果取出这个对象
+            if (targetProduct) {
+					/////////////////////////////////////////////////////////////////
+          	  		$("#productId").val(targetProduct.productId);
+					$("#productBakweight").val(targetProduct.productBakweight);
+					$("#productLeftweight").val(targetProduct.productLeftweight);
+					$("#productMaterialsource").val(targetProduct.productMaterialsource);
+					/////////////////////////////////////////////////////////////////
+            }
+	        //调用分页方法，只查钢锭
+            loadProductList_Iron();
 		   	});
+			
 	   } 
+	
+	//只查询钢锭的分页方法
+	function loadProductList_Iron(urlnew){
+		if (urlnew) {
+			url = urlnew;
+		} else {
+			url = "/product/productIron.json";
+		}
+			//默认7条数据
+		var bindPageSize =7;
+		//当前页
+		pageNo = $("#unboundedListPage .pageNo").val() || 1;
+		$.ajax({
+			url:url,
+			data : {
+				pageNo : pageNo,
+				pageSize : bindPageSize
+			},
+			type : 'POST',
+			success : function(result) {//jsondata  jsondata.getData=pageResult  pageResult.getData=list
+				//渲染模板
+				renderUnbounded(result, url);
+			}
+		});
+	}
+	
+	function renderUnbounded(result,url){
+		if (result.ret) {
+			//再次初始化查询条件
+			url="/product/productIron.json";
+			//如果查询到数据库中有符合条件的order列表
+			if (result.data.total > 0) {
+				var rendered = Mustache.render(
+						unboundedTemplate,
+						{
+							"productList" : result.data.data
+						});
+				
+				$('#unboundedList').html(rendered);
+			}
+			else{
+				$('#productList').html('');
+			}
+			realBind();//真正的绑定方法
+			var bindPageSize = 7;
+			var pageNo = $("#unboundedListPage .pageNo").val() || 1;
+//			alert(url);
+			//渲染页码
+			renderBindPage(
+					url,
+					result.data.total,
+					pageNo,
+					bindPageSize,
+					result.data.total > 0 ? result.data.data.length : 0,
+					"unboundedListPage", loadProductList_Iron);
+		}else{
+			
+		}
+	}
+//
+	
+	//真正的绑定事件
+	function realBind(){
+		$(".realBind-btn").click(function(e){
+			 //阻止默认事件
+	         e.preventDefault();
+				//阻止事件传播
+	         e.stopPropagation();
+			  //获取productid_Iron 钢锭id
+	         var productId_Iron = $(this).attr("data-id");
+	         //获取子材料id
+	         alert(productId_Iron);
+	         //获取父材料id  
+	         alert(productId_F);
+	         var ids=productId_Iron+"&"+productId_F;
+	         alert(ids);
+	         $.ajax({
+	        	 url:"/product/realBind.json",
+	 			data : {
+	 				ids : ids
+	 			},
+	 			type : 'POST',
+	 			success : function(result) {//jsondata  jsondata.getData=pageResult  pageResult.getData=list
+	 				//渲染模板
+//	 				renderUnbounded(result, url);
+	 				alert("返回成功");
+	 			}
+	         });
+		});
+	}
+	
 	
 	function updateOrder(successCallbak,failCallbak){
 //		alert($("#productUpdateForm").serializeArray())
@@ -267,8 +274,4 @@ $(function(){
 			}
 		});
 	}
-	
-	
-	
-	
 });

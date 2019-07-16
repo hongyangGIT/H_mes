@@ -33,28 +33,14 @@ public class ProductService {
 	private MesProductCustomerMapper mesProductCustomerMapper;
 	//添加材料
 	public void productinsert(MesProductVo mesProductVo) {
-//		List<String> lists=getPlanProducts();
-//		for(String s:lists) {
-//			System.out.println(s);
-//		}
 		String excption=null;
 		//校验
 		BeanValidator.check(mesProductVo);
 		//判断是否批量添加
 		Integer counts=mesProductVo.getCount();
-//		System.out.println("--------------"+counts);
 		//productId 集合
 		//id集合
 		List<String > productIds=createProductIdsDefault(Long.valueOf(counts));
-		
-//		System.out.println("----------------------");
-//		System.out.println("投料重量："+mesProductVo.getProductRealweight());
-//		if(mesProductVo.getProductRealweight().equals("0")) {
-//			System.out.println("等于0");
-//		}else {
-//			System.out.println("不等于0");
-//		}
-//		System.out.println(mesProductVo.getProductMaterialsource());
 		for(String productId:productIds) {
 			try {
 				//分为两种情况，材料来源：一种是钢锭，一种是其他材料
@@ -68,8 +54,13 @@ public class ProductService {
 						throw new SysMineException(excption);
 					}
 				}else {
-					insertTemp(mesProductVo,productId);
-//			
+					//判断投料重量与剩余重量
+					if(Float.parseFloat(mesProductVo.getProductRealweight())//
+							<Float.parseFloat(mesProductVo.getProductLeftweight())) {
+						excption="投料重量可能比剩余重量小吗？";
+						throw new SysMineException(excption);
+					}
+						insertTemp(mesProductVo,productId);
 				}
 			} catch (Exception e) {
 				if(excption==null) {
@@ -106,9 +97,6 @@ public class ProductService {
 		mesProduct.setProductOperator("hongyang");
 		mesProduct.setProductOperateIp("127.0.0.1");
 		mesProduct.setProductOperateTime(new Date());
-//		System.out.println("-----------------------------");
-//		System.out.println(mesProduct);
-//		System.out.println(productId);
 		mesProductMapper.insertSelective(mesProduct);
 	}
 	//修改
@@ -131,6 +119,12 @@ public class ProductService {
 					throw new SysMineException(excption);
 				}
 			}else {
+				//判断投料重量与剩余重量
+				if(Float.parseFloat(mesProductVo.getProductRealweight())//
+						<Float.parseFloat(mesProductVo.getProductLeftweight())) {
+					excption="投料重量可能比剩余重量小吗？";
+					throw new SysMineException(excption);
+				}
 				updateTemp(mesProductVo);
 			}
 			
@@ -170,8 +164,6 @@ public class ProductService {
 			mesProduct.setProductOperator("hongyang");
 			mesProduct.setProductOperateIp("127.0.0.1");
 			mesProduct.setProductOperateTime(new Date());
-//			System.out.println("-------------------------------");
-//			System.out.println(mesProduct);
 			mesProductMapper.updateByPrimaryKeySelective(mesProduct);
 	}
 	
@@ -202,6 +194,37 @@ public class ProductService {
 	
 	
 	
+	
+	//批量到库
+	public void productStart(String ids) {
+		if(ids!=null&&ids.length()>0) {
+			String[] idArray=ids.split("&");
+			mesProductCustomerMapper.productStart(idArray);
+		
+		}
+		
+	}
+	
+	
+	//钢锭查询分页
+	public PageResult<MesProduct> searchProductIronAjax(SearchProductParam param, PageQuery page) {
+		//校验
+				BeanValidator.check(page);
+				// searchDto 用于分页的where语句后面
+				SearchProductDto dto=new SearchProductDto();	
+				if (StringUtils.isNotBlank(param.getKeyword())) {
+					dto.setKeyword("%" + param.getKeyword() + "%");
+				}
+				if (StringUtils.isNotBlank(param.getSearch_status())) {
+					dto.setSearch_status(Integer.parseInt(param.getSearch_status()));
+				}
+				int count = mesProductCustomerMapper.countBySearchDto_Iron(dto);
+				if (count > 0) {
+					List<MesProduct> productList_Iron = mesProductCustomerMapper.getPageListBySearchDto_Iron(dto, page);
+					return PageResult.<MesProduct>builder().total(count).data(productList_Iron).build();
+				}
+				return PageResult.<MesProduct>builder().build();
+	}
 	
 	
 	
@@ -326,5 +349,6 @@ public class ProductService {
 					return "IdGenerator [ids=" + ids + "]";
 				}
 			}
+			
 			
 }

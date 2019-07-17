@@ -79,6 +79,9 @@
 			<if test="dto.search_materialsource == null">
 				AND product_materialsource != '钢锭'
 			</if>
+			<if test="dto.bindPage_status!=null">
+				AND product_leftweight !=0
+			</if>
 			<if test="dto.keyword != null and dto.keyword != ''">
 				AND ((product_id like #{dto.keyword}) or (p_id like #{dto.keyword}) or
 				(product_materialname like #{dto.keyword}) or (product_materialsource like
@@ -108,6 +111,16 @@
 		limit #{page_Iron.offset}, #{page_Iron.pageSize}
 	</select>
 	
+	<!--钢锭查询分页 -->
+<!-- 	<select id="getPageListBySearchDto_Iron" parameterType="map" -->
+<!-- 		resultMap="BaseResultMap"> -->
+<!-- 		SELECT pro1.*,pro2.`product_id`  -->
+<!-- 		FROM mes_product AS pro1 INNER JOIN mes_product AS pro2 ON pro1.p_id=pro2.id -->
+<!-- 		<include refid="queryConditions_Iron" /> -->
+<!-- 		ORDER BY product_operate_time DESC,id DESC -->
+<!-- 		limit #{page_Iron.offset}, #{page_Iron.pageSize} -->
+<!-- 	</select> -->
+	
 	<!-- where：帮助你增加一个where拼接，解下来将第一个出现的and去掉 -->
 	<sql id="queryConditions_Iron">
 		<where>
@@ -115,7 +128,12 @@
 			<if test="dto_Iron.search_status != null">
 				AND product_status = #{dto_Iron.search_status}
 			</if>
-			
+			<if test="dto_Iron.bindIcon_status!=null">
+				AND product_targetweight>0 and p_id is null
+			</if>
+			<if test="dto_Iron.isbindIcon_status!=null">
+				AND p_id=#{dto_Iron.productId_F}
+			</if>
 			<if test="dto_Iron.keyword != null and dto_Iron.keyword != ''">
 				AND ((product_id like #{dto_Iron.keyword}) or (p_id like #{dto_Iron.keyword}) or
 				(product_materialname like #{dto_Iron.keyword}) or (product_materialsource like
@@ -126,6 +144,15 @@
 	</sql>
 	
 	
+	
+<!-- 	绑定sql -->
+	<update id="bingUpdate" parameterType="map">
+		UPDATE mes_product AS pro1,mes_product AS pro2 
+		SET pro1.p_id =#{idArray_F},pro1.product_bakweight=pro1.product_targetweight,
+		pro1.product_status=1,
+		pro2.product_bakweight=#{status} 
+		WHERE pro1.id=#{idArray_Iron} AND pro2.id=#{idArray_F};
+	</update>
 	
 	
 	

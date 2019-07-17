@@ -19,4 +19,9 @@ public class SearchProductParam {
 
     private String search_materialsource;
     private String search_status;
+    private String bindPage_status;
+    private String bindIcon_status;
+    private String isbindIcon_status;
+    //父id
+    private String productId_F;
 }

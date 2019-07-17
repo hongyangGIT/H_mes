@@ -8,10 +8,10 @@ $(function(){
 			type : 'POST',
 			success : function(result) {
 				//数据执行成功返回的消息
-//				alert(666);
 				if(result.ret){
 					showMessage("新增材料", result.msg,
 							true);
+					window.location.href="/product/product.page";
 				}else{
 					 showMessage("新增材料", result.msg, false);
 				}

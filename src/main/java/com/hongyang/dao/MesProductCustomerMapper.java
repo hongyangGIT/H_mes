@@ -23,4 +23,6 @@ public interface MesProductCustomerMapper {
 	int countBySearchDto_Iron(@Param("dto_Iron") SearchProductDto dto);
 
 	List<MesProduct> getPageListBySearchDto_Iron(@Param("dto_Iron") SearchProductDto dto,@Param("page_Iron") PageQuery page);
+
+	void bingUpdate(@Param("idArray_Iron") String idArray_Iron,@Param("idArray_F") String idArray_F,@Param("status") Integer status);
 }

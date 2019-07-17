@@ -17,10 +17,9 @@
     <td>{{#bold}}{{showStatus}}{{/bold}}</td> 
     <td>{{productRemark}}</td>
 	<td>
-		<div class="dataTables_length" id="dynamic-table_length">
-			<a class="blue bind-btn" href="#" data-id="{{id}}">
-				<button class="btn btn-info fa fa-check "
-			style="margin-bottom: 6px;" type="button">点击绑定</button>
+		<div class="hidden-sm hidden-xs action-buttons" id="dynamic-table_length">
+			<a class="blue bind-btn btn btn-info fa fa-check" href="#" data-id="{{id}}" product_leftweight_F="{{productLeftweight}}">
+				点击绑定
 			</a>
 		</div>
 	</td>

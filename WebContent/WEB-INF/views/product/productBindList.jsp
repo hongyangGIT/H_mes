@@ -9,8 +9,10 @@
 <%@ include file="/common/backend_common.jsp" %>
 <%@ include file="/common/page.jsp" %>
 <%@ include file="/common/bindPage.jsp" %>
+<%@ include file="/common/isBindPage.jsp" %>
 <%@ include file="/template/productBindListTemplate.jsp" %>
 <%@ include file="/template/unboundedTemplate.jsp" %>
+<%@ include file="/template/isBindTemplate.jsp" %>
 </head>
 <body class="no-skin" youdao="bind" style="background: white">
 	<input id="gritter-light" checked="" type="checkbox"
@@ -52,6 +54,7 @@
 											<option value="外协件">外协件</option>
 											<option value="外购件">外购件</option>
 									</select>
+									<input type="hidden" name="bindPage_status" id="bindPage_status" value="1">
 									&nbsp;&nbsp;&nbsp;&nbsp;
 									<button class="btn btn-info fa fa-check research"
 										style="margin-bottom: 6px;" type="button">刷新</button>
@@ -115,7 +118,7 @@
 		
 		
 		
-		
+<!-- 		----------------------------------------------------------------------------------------------- -->
 		
 		<div class="col-sm-6 two">
 			<div class="col-xs-12">
@@ -155,6 +158,7 @@
 											<option value="外协件">外协件</option>
 											<option value="外购件">外购件</option>
 									</select>
+									<input type="hidden" name="bindIcon_status" id="bindIcon_status" value="1">
 									&nbsp;&nbsp;&nbsp;&nbsp;
 									<button class="btn btn-info fa fa-check research"
 										style="margin-bottom: 6px;" type="button">刷新</button>
@@ -195,13 +199,14 @@
 		</div>
 		
 		
-		
+<!-- ------------------------------------------------------------------------------		 -->
 		<div class="col-sm-6 two">
 			<div class="col-xs-12">
 				<div class="table-header">
 					已绑定材料列表
 				</div>
 				<div>
+				<input type="hidden" name="isbindIcon_status" id="isbindIcon_status" value="1">
 					<div id="dynamic-table_wrapper"
 						class="dataTables_wrapper form-inline no-footer">
 						<table id="dynamic-table"
@@ -223,11 +228,14 @@
 										colspan="1">操作</th>
 								</tr>
 							</thead>
-							<tbody id="bindlisttwo">
+							<tbody id="isBindList">
 							
 							
 							</tbody>
 						</table>
+						<div class="row" id="isBindListPage">
+						
+							</div>
 					</div>
 				</div>
 			</div>

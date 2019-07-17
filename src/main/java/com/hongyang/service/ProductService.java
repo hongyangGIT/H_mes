@@ -184,6 +184,9 @@ public class ProductService {
 		if (StringUtils.isNotBlank(param.getSearch_status())) {
 			dto.setSearch_status(Integer.parseInt(param.getSearch_status()));
 		}
+		if (StringUtils.isNotBlank(param.getBindPage_status())) {
+			dto.setBindPage_status(param.getBindPage_status());
+		}
 		int count = mesProductCustomerMapper.countBySearchDto(dto);
 		if (count > 0) {
 			List<MesProduct> productList = mesProductCustomerMapper.getPageListBySearchDto(dto, page);
@@ -218,6 +221,15 @@ public class ProductService {
 				if (StringUtils.isNotBlank(param.getSearch_status())) {
 					dto.setSearch_status(Integer.parseInt(param.getSearch_status()));
 				}
+				if (StringUtils.isNotBlank(param.getBindIcon_status())) {
+					dto.setBindIcon_status(param.getBindIcon_status());
+				}
+				if (StringUtils.isNotBlank(param.getIsbindIcon_status())) {
+					dto.setIsbindIcon_status(param.getIsbindIcon_status());
+				}
+				if (StringUtils.isNotBlank(param.getProductId_F())) {
+					dto.setProductId_F(param.getProductId_F());
+				}
 				int count = mesProductCustomerMapper.countBySearchDto_Iron(dto);
 				if (count > 0) {
 					List<MesProduct> productList_Iron = mesProductCustomerMapper.getPageListBySearchDto_Iron(dto, page);
@@ -227,6 +239,14 @@ public class ProductService {
 	}
 	
 	
+	//材料绑定方法
+	public void realBindAjax(String ids, Integer status) {
+		String[] idArray=ids.split("&");
+		if(idArray.length>0&&status>=0) {
+			//idArray[0]--子材料id idArray[1]--父材料id
+			mesProductCustomerMapper.bingUpdate(idArray[0],idArray[1],status);
+		}
+	}
 	
 	
 	
@@ -349,6 +369,7 @@ public class ProductService {
 					return "IdGenerator [ids=" + ids + "]";
 				}
 			}
+			
 			
 			
 }

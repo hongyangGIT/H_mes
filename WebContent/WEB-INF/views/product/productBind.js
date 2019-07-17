@@ -9,16 +9,21 @@ $(function(){
 	var keyword;//关键字
 	var search_materialsource;//查询状态  钢材  废材  外协件 外购件  "" 
 	var search_status;
+	var bindPage_status;
+	var bindIcon_status;
 	 var productId_F;//存放productid-父id
+	 var product_leftweight_F;
 	//加载模板内容进html
 	//获取模板内容
 	var productListTemplate = $("#productListTemplate").html();
 	//将内容交给mustache来处理
 	Mustache.parse(productListTemplate);
-	
+	//未绑定页面模板
 	var unboundedTemplate=$("#unboundedTemplate").html();
-	
 	Mustache.parse(unboundedTemplate);
+	//已绑定页面模板
+	var isBindTemplate=$("#isBindTemplate").html();
+	Mustache.parse(isBindTemplate);
 	
 	//调用分页函数
 	loadProductList();
@@ -42,6 +47,7 @@ $(function(){
 		}
 		keyword = $("#keyword").val();
 		search_materialsource = $("#search_materialsource").val();
+		bindPage_status=$("#bindPage_status").val();
 		search_status=1;
 		//发送请求
 		$.ajax({
@@ -51,7 +57,8 @@ $(function(){
 				pageSize : pageSize,
 				keyword : keyword,
 				search_materialsource : search_materialsource,
-				search_status:search_status
+				search_status:search_status,
+				bindPage_status:bindPage_status
 			},
 			type : 'POST',
 			success : function(result) {//jsondata  jsondata.getData=pageResult  pageResult.getData=list
@@ -126,6 +133,7 @@ $(function(){
 			showMessage("获取订单列表", result.msg, false);
 		}
 	}
+//---------------------------------------------------------------
 //	//点击绑定
 	function bindProductClick(){
 		   $(".bind-btn").click(function(e) {
@@ -135,10 +143,13 @@ $(function(){
 	         e.stopPropagation();
 	       //获取productid
 	         var productId = $(this).attr("data-id");
+	         var product_leftweight=$(this).attr("product_leftweight_F");
 	        if(productId){
 	        	productId_F=productId;
 	        }
-	         
+	        if(product_leftweight){
+	        	product_leftweight_F=product_leftweight;
+	        }
 	        $(".one").hide();
 	        $(".two").show();
 	      //拿到map中以键值对，id-product对象结构的对象,用来向form表单中传递数据
@@ -154,10 +165,94 @@ $(function(){
             }
 	        //调用分页方法，只查钢锭
             loadProductList_Iron();
+            //调用已绑定页面分页方法
+            isBindProductList();
 		   	});
 			
 	   } 
 	
+	//已绑定页面分页
+	function isBindProductList(urlnew){
+		if (urlnew) {
+			url = urlnew;
+		} else {
+			url = "/product/productIron.json";
+		}
+		//用来做查询已绑定材料的条件
+		isbindIcon_status=$("#isbindIcon_status").val();
+//		alert(isbindIcon_status);
+		//父id
+//		alert(productId_F);
+			//默认7条数据
+		var bindPageSize =7;
+		//当前页
+		pageNo = $("#isBindListPage .pageNo").val() || 1;
+		//
+		search_status=1;
+		$.ajax({
+			url:url,
+			data : {
+				pageNo : pageNo,
+				pageSize : bindPageSize,
+				search_status,
+				isbindIcon_status:isbindIcon_status,
+				productId_F:productId_F
+			},
+			type : 'POST',
+			success : function(result) {//jsondata  jsondata.getData=pageResult  pageResult.getData=list
+				//渲染模板
+//				alert("返回成功")
+				renderisBind(result, url);
+			}
+		});
+		
+	}
+	function renderisBind(result,url){
+		if (result.ret) {
+			//再次初始化查询条件
+			url="/product/productIron.json";
+			//如果查询到数据库中有符合条件的product列表
+			if (result.data.total > 0) {
+				var rendered = Mustache.render(
+						isBindTemplate,
+						{
+							"productList" : result.data.data
+						});
+				
+				$('#isBindList').html(rendered);
+			}
+			else{
+				$('#isBindList').html('');
+			}
+			unbind();//解绑方法
+			var bindPageSize = 7;
+			var pageNo = $("#isBindListPage .pageNo").val() || 1;
+//			alert(url);
+			//渲染页码
+			renderisBindPage(
+					url,
+					result.data.total,
+					pageNo,
+					bindPageSize,
+					result.data.total > 0 ? result.data.data.length : 0,
+					"isBindListPage", isBindProductList);
+		}else{
+			showMessage("获取已绑定列表", result.msg, false);
+		}
+	}
+	//解绑
+	function unbind(){
+		$(".unBind-btn").click(function(e){
+			//阻止默认事件
+	         e.preventDefault();
+				//阻止事件传播
+	         e.stopPropagation();
+//	         alert(66);
+		});
+	}
+	
+	
+//------------------------------------------------------------------------	
 	//只查询钢锭的分页方法
 	function loadProductList_Iron(urlnew){
 		if (urlnew) {
@@ -165,6 +260,7 @@ $(function(){
 		} else {
 			url = "/product/productIron.json";
 		}
+		bindIcon_status=$("#bindIcon_status").val();
 			//默认7条数据
 		var bindPageSize =7;
 		//当前页
@@ -173,7 +269,8 @@ $(function(){
 			url:url,
 			data : {
 				pageNo : pageNo,
-				pageSize : bindPageSize
+				pageSize : bindPageSize,
+				bindIcon_status:bindIcon_status
 			},
 			type : 'POST',
 			success : function(result) {//jsondata  jsondata.getData=pageResult  pageResult.getData=list
@@ -198,7 +295,7 @@ $(function(){
 				$('#unboundedList').html(rendered);
 			}
 			else{
-				$('#productList').html('');
+				$('#unboundedList').html('');
 			}
 			realBind();//真正的绑定方法
 			var bindPageSize = 7;
@@ -213,7 +310,7 @@ $(function(){
 					result.data.total > 0 ? result.data.data.length : 0,
 					"unboundedListPage", loadProductList_Iron);
 		}else{
-			
+			showMessage("获取未绑定列表", result.msg, false);
 		}
 	}
 //
@@ -226,25 +323,39 @@ $(function(){
 				//阻止事件传播
 	         e.stopPropagation();
 			  //获取productid_Iron 钢锭id
-	         var productId_Iron = $(this).attr("data-id");
 	         //获取子材料id
-	         alert(productId_Iron);
+	         var productId_Iron = $(this).attr("data-id");
+	         //获取子材料工艺重量
+	         var product_targetweight=$(this).attr("product_targetweight");
 	         //获取父材料id  
-	         alert(productId_F);
+//	         alert(productId_Iron);
+//	         alert(productId_F);
+//	         alert(product_targetweight);
+//	         alert(product_leftweight_F);
 	         var ids=productId_Iron+"&"+productId_F;
-	         alert(ids);
+//	         alert(ids);
+//	        ($("#productBakweight").val()-product_targetweight)>=0? 
+//	        	 $("#productBakweight").val($("#productBakweight").val()-product_targetweight);
+	        
+	        var status=$("#productBakweight").val()-product_targetweight;
+	        status>=0?$("#productBakweight").val($("#productBakweight").val()-product_targetweight):alert("不能在减少了，抽干了");
+	         if(status>=0){
 	         $.ajax({
 	        	 url:"/product/realBind.json",
 	 			data : {
-	 				ids : ids
+	 				ids:ids,
+	 				status:status
 	 			},
 	 			type : 'POST',
 	 			success : function(result) {//jsondata  jsondata.getData=pageResult  pageResult.getData=list
 	 				//渲染模板
 //	 				renderUnbounded(result, url);
-	 				alert("返回成功");
+	 				loadProductList_Iron();
+	 				 //调用已绑定页面分页方法
+	 	            isBindProductList();
 	 			}
 	         });
+	         }
 		});
 	}
 	

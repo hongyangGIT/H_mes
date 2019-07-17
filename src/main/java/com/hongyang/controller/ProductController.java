@@ -81,8 +81,8 @@ public class ProductController {
 	@RequestMapping("/productIron.json")
 	@ResponseBody
 	public JsonData searchProductIronAjax(SearchProductParam param,PageQuery page) {
-//		System.out.println("------------------------");
-//		System.out.println(param);
+		System.out.println("-------------------------------------------");
+		System.out.println(param);
 		PageResult<MesProduct> pr=productService.searchProductIronAjax(param,page);
 		return JsonData.success(pr);
 	}
@@ -100,9 +100,12 @@ public class ProductController {
 	//真正的绑定方法逻辑
 	@RequestMapping("/realBind.json")
 	@ResponseBody
-	public JsonData realBindAjax(String ids) {
+	public JsonData realBindAjax(String ids,Integer status) {
 		System.out.println("---------------------------ids------------------------");
 		System.out.println(ids);
+		System.out.println(status);
+		productService.realBindAjax(ids,status);
+		System.out.println("进来了");
 		return JsonData.success();
 	}
 }

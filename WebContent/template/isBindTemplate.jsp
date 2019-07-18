@@ -8,7 +8,7 @@
 	<td>{{productTargetweight}}</td>
 	<td>
 		<div class="hidden-sm hidden-xs action-buttons" id="dynamic-table_length">
-			<a class="btn blue unBind-btn  btn-danger  fa fa-check " href="#" data-id="{{id}}" product_targetweight="{{productTargetweight}}">
+			<a class="btn blue unBind-btn  btn-danger  fa fa-check " href="#" data-id="{{id}}" product_bakweight="{{productBakweight}}">
 				解除
 			</a>
 		</div>

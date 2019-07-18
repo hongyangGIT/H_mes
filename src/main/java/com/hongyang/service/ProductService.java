@@ -110,21 +110,30 @@ public class ProductService {
 		try {
 			//分为两种情况，材料来源：一种是钢锭，一种是其他材料
 			if(mesProductVo.getProductMaterialsource().equals("钢锭")) {
+				if(before.getProductStatus().equals(1)) {
+					excption="材料已绑定，不能修改";
+					throw new SysMineException(excption);
+				}
 				//如果是钢锭的话，判断投料重量与剩余重量是否为0，为0在添加进入数据库
 				//从界面传过来的数据都为String类型，直接用equals("0")就可以
-				if(mesProductVo.getProductRealweight().equals("0")&&mesProductVo.getProductLeftweight().equals("0")) {
+				else if(mesProductVo.getProductRealweight().equals("0")&&mesProductVo.getProductLeftweight().equals("0")) {
 					updateTemp(mesProductVo);
 				}else {
 					excption="钢锭的投料重量与剩余重量应该为0";
 					throw new SysMineException(excption);
 				}
 			}else {
+				if(before.getProductBakweight()<before.getProductLeftweight()) {
+					excption="材料已绑定，不能修改";
+					                                                                                            throw new SysMineException(excption);
+				}
 				//判断投料重量与剩余重量
 				if(Float.parseFloat(mesProductVo.getProductRealweight())//
 						<Float.parseFloat(mesProductVo.getProductLeftweight())) {
 					excption="投料重量可能比剩余重量小吗？";
 					throw new SysMineException(excption);
 				}
+				
 				updateTemp(mesProductVo);
 			}
 			
@@ -240,13 +249,35 @@ public class ProductService {
 	
 	
 	//材料绑定方法
-	public void realBindAjax(String ids, Integer status) {
+	public void realBindAjax(String ids, Float status) {
 		String[] idArray=ids.split("&");
 		if(idArray.length>0&&status>=0) {
 			//idArray[0]--子材料id idArray[1]--父材料id
 			mesProductCustomerMapper.bingUpdate(idArray[0],idArray[1],status);
 		}
 	}
+	
+	
+	//点击绑定查询一条数据
+	public MesProduct bindOneSearchAjax(Integer id) {
+		return mesProductMapper.selectByPrimaryKey(id);
+	}
+	
+	//材料解绑
+	public void unBindProductAjax(Float bakweight, Float bakweight_F, String ids) {
+		String[] idArray=ids.split("&");
+		//解绑过程把父材料的备份重量与子材料的剩余重量相加即可
+		Float status=bakweight_F+bakweight;
+		if(idArray.length>0) {
+			//idArray[0]--子材料id idArray[1]--父材料id
+			mesProductCustomerMapper.unBingUpdate(idArray[0],idArray[1],status);
+		}
+	}
+	
+	
+	
+	
+	
 	
 	
 	
@@ -369,6 +400,8 @@ public class ProductService {
 					return "IdGenerator [ids=" + ids + "]";
 				}
 			}
+			
+			
 			
 			
 			

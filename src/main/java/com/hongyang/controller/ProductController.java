@@ -100,12 +100,33 @@ public class ProductController {
 	//真正的绑定方法逻辑
 	@RequestMapping("/realBind.json")
 	@ResponseBody
-	public JsonData realBindAjax(String ids,Integer status) {
-		System.out.println("---------------------------ids------------------------");
-		System.out.println(ids);
-		System.out.println(status);
+	public JsonData realBindAjax(String ids,Float status) {
+//		System.out.println("---------------------------ids------------------------");
+//		System.out.println(ids);
+//		System.out.println(status);
 		productService.realBindAjax(ids,status);
-		System.out.println("进来了");
+		return JsonData.success();
+	}
+	
+	//绑定页面查询一条父级数据
+	@RequestMapping("/bindOneSearch.json")
+	@ResponseBody
+	public JsonData bindOneSearchAjax(Integer id) {
+		System.out.println("-----------------------id-------------------------------");
+		System.out.println(id);
+		MesProduct mp=productService.bindOneSearchAjax(id);
+		return JsonData.success(mp);
+	}
+	
+	//解除绑定逻辑
+	@RequestMapping("/unBindProduct.json")
+	@ResponseBody
+	public JsonData unBindProductAjax(Float bakweight,Float bakweight_F,String ids) {
+//		System.out.println("---------------------解绑数据-----------------------");
+//		System.out.println(bakweight);
+//		System.out.println(bakweight_F);
+//		System.out.println(ids);
+		productService.unBindProductAjax(bakweight,bakweight_F,ids);
 		return JsonData.success();
 	}
 }

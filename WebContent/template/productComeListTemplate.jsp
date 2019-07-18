@@ -3,7 +3,7 @@
 {{#productList}}
  <tr role="row" class="order-name odd" data-id="{{id}}"><!--even -->
 	<td><a href="#" data-id="{{productId}}">{{productId}}</a></td>
-	<td>{{pid}}</td>
+	<td><a href="#" data-id="{{productId_F}}">{{productId_F}}</a></td>
 	<td>{{productHeatid}}</td>
 	<td>{{productMaterialname}}</td>
 	<td>{{productMaterialsource}}</td>

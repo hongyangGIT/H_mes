@@ -152,7 +152,7 @@
 										&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;材料来源 <select
 										id="productMaterialsource" name="productMaterialsource"
 										aria-controls="dynamic-table" class="form-control input-sm">
-											<option value="钢材">钢锭</option>
+											<option value="钢锭">钢锭</option>
 											<option value="钢材">钢材</option>
 											<option value="废料">废料</option>
 											<option value="外协件">外协件</option>
@@ -160,7 +160,7 @@
 									</select>
 									<input type="hidden" name="bindIcon_status" id="bindIcon_status" value="1">
 									&nbsp;&nbsp;&nbsp;&nbsp;
-									<button class="btn btn-info fa fa-check research"
+									<button class="btn btn-info fa fa-check researchBind"
 										style="margin-bottom: 6px;" type="button">刷新</button>
 									&nbsp;&nbsp;&nbsp;&nbsp;
 								</div>

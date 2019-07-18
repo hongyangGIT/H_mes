@@ -1,8 +1,7 @@
 package com.hongyang.model;
 
 import java.util.Date;
-
-import com.hongyang.model.MesOrder.MesOrderBuilder;
+import java.util.List;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -56,5 +55,10 @@ public class MesProduct {
     private Date productOperateTime;
 
     private String productOperateIp;
+    
+    private String productId_F;
+
+	
+    
    
 }

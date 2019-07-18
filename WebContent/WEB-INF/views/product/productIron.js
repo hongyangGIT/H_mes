@@ -64,7 +64,7 @@ $(function(){
 		//从数据库返回过来的数据集合result
 		if (result.ret) {
 			//再次初始化查询条件
-			url = "/product/product.json";
+			url = "/product/productIron.json";
 			keyword = $("#keyword").val();
 			search_materialsource = $("#search_materialsource").val();
 			

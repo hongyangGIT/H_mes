@@ -92,6 +92,13 @@ public class ProductController {
 	public String productBindListPage() {
 		return FPATH+"productBindList";
 	}
+	//未绑定页面分页
+	@RequestMapping("/unboundedProduct.json")
+	@ResponseBody
+	public JsonData unboundedProduct(SearchProductParam param,PageQuery page) {
+		PageResult<MesProduct> pr=productService.unboundedProduct(param,page);
+		return JsonData.success(pr);
+	}
 //	//真正的绑定页面
 //	@RequestMapping("/bind.page")
 //	public String bindPage() {

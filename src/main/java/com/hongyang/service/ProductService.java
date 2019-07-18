@@ -247,7 +247,41 @@ public class ProductService {
 				return PageResult.<MesProduct>builder().build();
 	}
 	
-	
+	//未绑定材料分页查询
+	public PageResult<MesProduct> unboundedProduct(SearchProductParam param, PageQuery page) {
+		BeanValidator.check(page);
+		// searchDto 用于分页的where语句后面
+		SearchProductDto dto=new SearchProductDto();	
+		if (StringUtils.isNotBlank(param.getKeyword())) {
+			dto.setKeyword("%" + param.getKeyword() + "%");
+		}
+		if (StringUtils.isNotBlank(param.getSearch_status())) {
+			dto.setSearch_status(Integer.parseInt(param.getSearch_status()));
+		}
+		if (StringUtils.isNotBlank(param.getBindIcon_status())) {
+			dto.setBindIcon_status(param.getBindIcon_status());
+		}
+		if (StringUtils.isNotBlank(param.getIsbindIcon_status())) {
+			dto.setIsbindIcon_status(param.getIsbindIcon_status());
+		}
+		if (StringUtils.isNotBlank(param.getProductId_F())) {
+			dto.setProductId_F(param.getProductId_F());
+		}
+		if(param.getSearch_materialsource().equals("钢锭")) {
+			int count = mesProductCustomerMapper.countBySearchDto_Iron(dto);
+			if (count > 0) {
+				List<MesProduct> productList_Iron = mesProductCustomerMapper.getPageListBySearchDto_Iron(dto, page);
+				return PageResult.<MesProduct>builder().total(count).data(productList_Iron).build();
+			}
+		}else {
+			int count = mesProductCustomerMapper.countBySearchDto(dto);
+//			if (count > 0) {
+				List<MesProduct> productList = mesProductCustomerMapper.getPageListBySearchDto(dto, page);
+				return PageResult.<MesProduct>builder().total(count).data(productList).build();
+//			}
+		}
+		return PageResult.<MesProduct>builder().build();
+	}
 	//材料绑定方法
 	public void realBindAjax(String ids, Float status) {
 		String[] idArray=ids.split("&");
@@ -400,6 +434,7 @@ public class ProductService {
 					return "IdGenerator [ids=" + ids + "]";
 				}
 			}
+			
 			
 			
 			

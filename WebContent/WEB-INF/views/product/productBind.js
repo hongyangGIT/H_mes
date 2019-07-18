@@ -191,7 +191,6 @@ $(function(){
 					$("#productId").val(result.data.productId);
 					$("#productBakweight").val(result.data.productBakweight);
 					$("#productLeftweight").val(result.data.productLeftweight);
-					$("#productMaterialsource").val(result.data.productMaterialsource);
 					//调用分页方法，只查钢锭
 		            loadProductList_Iron();
 		            //调用已绑定页面分页方法
@@ -300,6 +299,7 @@ $(function(){
 //	 				alert("返回成功");
 	 				searchAjax(productId);
 	 				loadProductList_Iron();
+	 				
 	 				 //调用已绑定页面分页方法
 	 	            isBindProductList();
 	 			}
@@ -310,14 +310,15 @@ $(function(){
 	
 	
 //------------------------------------------------------------------------	
-	//只查询钢锭的分页方法
+	//未绑定页面分页
 	function loadProductList_Iron(urlnew){
 		if (urlnew) {
 			url = urlnew;
 		} else {
-			url = "/product/productIron.json";
+			url = "/product/unboundedProduct.json";
 		}
 		bindIcon_status=$("#bindIcon_status").val();
+		var productMaterialsource=$("#productMaterialsource").val();
 			//默认7条数据
 		var bindPageSize =7;
 		//当前页
@@ -327,7 +328,8 @@ $(function(){
 			data : {
 				pageNo : pageNo,
 				pageSize : bindPageSize,
-				bindIcon_status:bindIcon_status
+				bindIcon_status:bindIcon_status,
+				search_materialsource:productMaterialsource
 			},
 			type : 'POST',
 			success : function(result) {//jsondata  jsondata.getData=pageResult  pageResult.getData=list
@@ -335,8 +337,14 @@ $(function(){
 				renderUnbounded(result, url);
 			}
 		});
+		
 	}
-	
+	//点击刷新按钮
+	$(".researchBind").click(function(e) {
+		e.preventDefault();
+		$("#unboundedListPage .pageNo").val(1);
+		loadProductList_Iron();
+	});
 	function renderUnbounded(result,url){
 		if (result.ret) {
 			//再次初始化查询条件

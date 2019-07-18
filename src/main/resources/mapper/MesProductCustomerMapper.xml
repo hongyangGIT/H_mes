@@ -22,17 +22,18 @@
     <result column="product_operator" property="productOperator" jdbcType="VARCHAR" />
     <result column="product_operate_time" property="productOperateTime" jdbcType="TIMESTAMP" />
     <result column="product_operate_ip" property="productOperateIp" jdbcType="VARCHAR" />
+    <result column="product_id_F" property="productId_F" jdbcType="VARCHAR" />
   </resultMap>
   <sql id="Base_Column_List" >
-    id, p_id, product_id, product_orderid, product_planid, product_targetweight, product_realweight, 
+    id, p_id, product_id `product_id_C`, product_orderid, product_planid, product_targetweight, product_realweight, 
     product_leftweight, product_bakweight, product_irontype, product_irontypeweight, 
     product_materialname, product_imgid, product_heatid, product_materialsource, product_status, 
-    product_remark, product_operator, product_operate_time, product_operate_ip
+    product_remark, product_operator, product_operate_time, product_operate_ip,product_id_F 
   </sql>
   <select id="getProductCount" resultType="Long">
   	SELECT
   	COUNT(1)
-  	FROM mes_product
+  	FROM mes_product 
   </select>
   <select id="getPlanProducts" resultType="String">
   	SELECT product_id FROM mes_product;
@@ -41,7 +42,7 @@
    <select id="countBySearchDto" parameterType="map"
 		resultType="int">
 		SELECT count(1)
-		FROM mes_product
+		FROM mes_product AS pro1
 		<include refid="queryConditions" />
 	</select>
 	
@@ -49,8 +50,8 @@
 	<select id="getPageListBySearchDto" parameterType="map"
 		resultMap="BaseResultMap">
 		SELECT
-		<include refid="Base_Column_List" />
-		FROM mes_product
+		pro1.*,pro2.`product_id` as `product_id_F` 
+		FROM mes_product AS pro1 left JOIN mes_product AS pro2 ON pro1.p_id=pro2.id
 		<include refid="queryConditions" />
 		ORDER BY product_operate_time DESC
 <!-- 		,id DESC,product_bakweight DESC -->
@@ -72,23 +73,22 @@
 	<sql id="queryConditions">
 		<where>
 			<if test="dto.search_status != null">
-				AND product_status = #{dto.search_status}
+				AND pro1.product_status = #{dto.search_status}
 			</if>
 			<if test="dto.search_materialsource != null">
-				AND product_materialsource = #{dto.search_materialsource}
+				AND pro1.product_materialsource = #{dto.search_materialsource}
 			</if>
 			<if test="dto.search_materialsource == null">
-				AND product_materialsource != '钢锭'
+				AND pro1.product_materialsource != '钢锭'
 			</if>
 			<if test="dto.bindPage_status!=null">
-				AND product_targetweight !=0
+				AND pro1.product_targetweight >0 and pro1.product_realweight >0
 			</if>
 			<if test="dto.keyword != null and dto.keyword != ''">
-				AND ((product_id like #{dto.keyword}) or (p_id like #{dto.keyword}) or
-				(product_materialname like #{dto.keyword}) or (product_materialsource like
-				#{dto.keyword}) or (product_heatid like #{dto.keyword}))
+				AND ((pro1.product_id like #{dto.keyword}) or (pro1.p_id like #{dto.keyword}) or
+				(pro1.product_materialname like #{dto.keyword}) or (pro1.product_materialsource like
+				#{dto.keyword}) or (pro1.product_heatid like #{dto.keyword}))
 			</if>
-			
 		</where>
 	</sql>
 	
@@ -97,52 +97,84 @@
 	 <select id="countBySearchDto_Iron" parameterType="map"
 		resultType="int">
 		SELECT count(1)
-		FROM mes_product
+		FROM mes_product AS pro1
 		<include refid="queryConditions_Iron" />
-	</select>
-	
-	<!--钢锭查询分页 -->
-	<select id="getPageListBySearchDto_Iron" parameterType="map"
-		resultMap="BaseResultMap">
-		SELECT
-		<include refid="Base_Column_List" />
-		FROM mes_product
-		<include refid="queryConditions_Iron" />
-		ORDER BY product_operate_time DESC,id DESC
-		limit #{page_Iron.offset}, #{page_Iron.pageSize}
 	</select>
 	
 	<!--钢锭查询分页 -->
 <!-- 	<select id="getPageListBySearchDto_Iron" parameterType="map" -->
 <!-- 		resultMap="BaseResultMap"> -->
-<!-- 		SELECT pro1.*,pro2.`product_id`  -->
-<!-- 		FROM mes_product AS pro1 INNER JOIN mes_product AS pro2 ON pro1.p_id=pro2.id -->
+<!-- 		SELECT -->
+<!-- 		<include refid="Base_Column_List" /> -->
+<!-- 		FROM mes_product -->
 <!-- 		<include refid="queryConditions_Iron" /> -->
 <!-- 		ORDER BY product_operate_time DESC,id DESC -->
 <!-- 		limit #{page_Iron.offset}, #{page_Iron.pageSize} -->
 <!-- 	</select> -->
 	
-	<!-- where：帮助你增加一个where拼接，解下来将第一个出现的and去掉 -->
+	<!--钢锭查询分页 -->
+	<select id="getPageListBySearchDto_Iron" parameterType="map"
+		resultMap="BaseResultMap">
+		SELECT 
+		<include refid="queryConditions_Iron_judge" />
+		<include refid="queryConditions_Iron" />
+		ORDER BY product_operate_time DESC,id DESC
+		limit #{page_Iron.offset}, #{page_Iron.pageSize}
+	</select>
+	<sql id="queryConditions_Iron_judge">
+<!-- 			<if test="dto_Iron.search_status == 0"> -->
+<!-- 				pro1.*  -->
+<!-- 				FROM mes_product AS pro1  -->
+<!-- 			</if> -->
+<!-- 			<if test="dto_Iron.search_status == 1"> -->
+				pro1.*,pro2.`product_id` as `product_id_F` 
+				FROM mes_product AS pro1 left JOIN mes_product AS pro2 ON pro1.p_id=pro2.id
+<!-- 			</if> -->
+	</sql>
 	<sql id="queryConditions_Iron">
 		<where>
-			AND product_materialsource='钢锭'
+			AND pro1.product_materialsource='钢锭'
 			<if test="dto_Iron.search_status != null">
-				AND product_status = #{dto_Iron.search_status}
+				AND pro1.product_status = #{dto_Iron.search_status}
 			</if>
 			<if test="dto_Iron.bindIcon_status!=null">
-				AND product_targetweight>0 and p_id is null and product_status=0 
+				AND pro1.product_targetweight>0 and pro1.p_id is null and pro1.product_status=0 
 			</if>
 			<if test="dto_Iron.isbindIcon_status!=null">
-				AND p_id=#{dto_Iron.productId_F}
+				AND pro1.p_id=#{dto_Iron.productId_F}
 			</if>
 			<if test="dto_Iron.keyword != null and dto_Iron.keyword != ''">
-				AND ((product_id like #{dto_Iron.keyword}) or (p_id like #{dto_Iron.keyword}) or
-				(product_materialname like #{dto_Iron.keyword}) or (product_materialsource like
-				#{dto_Iron.keyword}) or (product_heatid like #{dto_Iron.keyword}))
+				AND ((pro1.product_id like #{dto_Iron.keyword}) or (pro1.p_id like #{dto_Iron.keyword}) or
+				(pro1.product_materialname like #{dto_Iron.keyword}) or (pro1.product_materialsource like
+				#{dto_Iron.keyword}) or (pro1.product_heatid like #{dto_Iron.keyword}))
 			</if>
 			
 		</where>
 	</sql>
+	
+	
+	
+	<!-- where：帮助你增加一个where拼接，解下来将第一个出现的and去掉 -->
+<!-- 	<sql id="queryConditions_Iron"> -->
+<!-- 		<where> -->
+<!-- 			AND product_materialsource='钢锭' -->
+<!-- 			<if test="dto_Iron.search_status != null"> -->
+<!-- 				AND product_status = #{dto_Iron.search_status} -->
+<!-- 			</if> -->
+<!-- 			<if test="dto_Iron.bindIcon_status!=null"> -->
+<!-- 				AND product_targetweight>0 and p_id is null and product_status=0  -->
+<!-- 			</if> -->
+<!-- 			<if test="dto_Iron.isbindIcon_status!=null"> -->
+<!-- 				AND p_id=#{dto_Iron.productId_F} -->
+<!-- 			</if> -->
+<!-- 			<if test="dto_Iron.keyword != null and dto_Iron.keyword != ''"> -->
+<!-- 				AND ((product_id like #{dto_Iron.keyword}) or (p_id like #{dto_Iron.keyword}) or -->
+<!-- 				(product_materialname like #{dto_Iron.keyword}) or (product_materialsource like -->
+<!-- 				#{dto_Iron.keyword}) or (product_heatid like #{dto_Iron.keyword})) -->
+<!-- 			</if> -->
+			
+<!-- 		</where> -->
+<!-- 	</sql> -->
 	
 	
 	

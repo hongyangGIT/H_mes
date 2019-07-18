@@ -267,6 +267,9 @@ public class ProductService {
 		if (StringUtils.isNotBlank(param.getProductId_F())) {
 			dto.setProductId_F(param.getProductId_F());
 		}
+		if (StringUtils.isNotBlank(param.getSearch_materialsource())) {
+			dto.setSearch_materialsource(param.getSearch_materialsource());
+		}
 		if(param.getSearch_materialsource().equals("钢锭")) {
 			int count = mesProductCustomerMapper.countBySearchDto_Iron(dto);
 			if (count > 0) {

@@ -133,14 +133,16 @@
 	</sql>
 	<sql id="queryConditions_Iron">
 		<where>
+			<if test="dto_Iron.isbindIcon_status==null">
 			AND pro1.product_materialsource='钢锭'
+			</if>
 			<if test="dto_Iron.search_status != null">
 				AND pro1.product_status = #{dto_Iron.search_status}
 			</if>
 			<if test="dto_Iron.bindIcon_status!=null">
 				AND pro1.product_targetweight>0 and pro1.p_id is null and pro1.product_status=0 
 			</if>
-			<if test="dto_Iron.isbindIcon_status!=null">
+			<if test="dto_Iron.productId_F!=null">
 				AND pro1.p_id=#{dto_Iron.productId_F}
 			</if>
 			<if test="dto_Iron.keyword != null and dto_Iron.keyword != ''">

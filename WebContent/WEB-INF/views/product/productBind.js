@@ -222,7 +222,7 @@ $(function(){
 			data : {
 				pageNo : pageNo,
 				pageSize : bindPageSize,
-				search_status,
+				search_status:search_status,
 				isbindIcon_status:isbindIcon_status,
 				productId_F:productId_F
 			},
@@ -348,7 +348,7 @@ $(function(){
 	function renderUnbounded(result,url){
 		if (result.ret) {
 			//再次初始化查询条件
-			url="/product/productIron.json";
+			url = "/product/unboundedProduct.json";
 			//如果查询到数据库中有符合条件的order列表
 			if (result.data.total > 0) {
 				var rendered = Mustache.render(
